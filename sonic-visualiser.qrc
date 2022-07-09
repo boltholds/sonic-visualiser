@@ -14,6 +14,7 @@
     <file>icons/scalable/editdelete.svg</file>
     <file>icons/scalable/editpaste.svg</file>
     <file>icons/scalable/erase.svg</file>
+    <file>icons/scalable/exporttxt.svg</file>
     <file>icons/scalable/exit.svg</file>
     <file>icons/scalable/faders.svg</file>
     <file>icons/scalable/filenew.svg</file>
@@ -29,6 +30,7 @@
     <file>icons/scalable/interpolate.svg</file>
     <file>icons/scalable/lines.svg</file>
     <file>icons/scalable/fill.svg</file>
+    <file>icons/scalable/magic.svg</file>
     <file>icons/scalable/measure.svg</file>
     <file>icons/scalable/move.svg</file>
     <file>icons/scalable/navigate.svg</file>
@@ -46,8 +48,10 @@
     <file>icons/scalable/record.svg</file>
     <file>icons/scalable/redo.svg</file>
     <file>icons/scalable/regions.svg</file>
+    <file>icons/scalable/rendersh.svg</file>
     <file>icons/scalable/rewind-start.svg</file>
     <file>icons/scalable/rewind.svg</file>
+    <file>icons/scalable/removesh.svg</file>
     <file>icons/scalable/select.svg</file>
     <file>icons/scalable/show-peaks.svg</file>
     <file>icons/scalable/solo.svg</file>

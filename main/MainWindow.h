@@ -62,6 +62,10 @@ protected slots:
     virtual void importLayer();
     virtual void exportLayer();
     virtual void exportImage();
+    	virtual void exportTxtLayer();//fontangrad
+	virtual void RunRenderSH();
+	virtual void RunMagic();
+        virtual void RunRemoveSH();
     virtual void exportSVG();
     virtual void browseRecordedAudio();
     virtual void saveSession();
@@ -215,6 +219,15 @@ protected:
     QAction                 *m_scrollLeftAction;
     QAction                 *m_scrollRightAction;
     QAction                 *m_showPropertyBoxesAction;
+
+//fontangrad
+    QAction                 *m_ExportTxtAction;
+    QAction                 *m_RenderShAction;
+    QAction                 *m_MagicAction;
+    QAction                 *m_RemoveShAction;
+
+//
+
 
     bool                     m_soloModified;
     bool                     m_prevSolo;
