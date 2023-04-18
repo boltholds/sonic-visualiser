@@ -1,0 +1,100 @@
+#!/bin/bash
+
+set -eu
+
+case $(git status --porcelain --untracked-files=no) in
+    "") ;;
+    *) echo "ERROR: Current working copy has been modified - not proceeding"; exit 2;;
+esac
+
+mkdir -p packages
+echo
+
+version=$(grep '^ *version:' meson.build | sed "s/^ *version: *'//" | sed "s/'.*$//")
+
+if [ -d /Applications ]; then
+
+    archs="x86_64 arm64"
+    qtdir_x86_64="/Users/cannam/Qt/5.12.10/clang_64"
+    qtdir_arm64="/Users/cannam/Qt/5.15.2-arm64"
+
+    echo "Proceed to rebuild, package, and sign version $version using:"
+    for arch in $archs; do
+	case "$arch" in
+	    x86_64) qtdir="$qtdir_x86_64";;
+	    arm64) qtdir="$qtdir_arm64";;
+	    *) echo "(internal error, unknown arch)"; exit 1;;
+	esac
+	echo "-> for arch $arch: Qt dir $qtdir"
+	if [ ! -d "$qtdir" ]; then
+	    echo "*** ERROR: Qt dir $qtdir does not exist"
+	    exit 1
+	fi
+	if [ ! -f "$qtdir/bin/qmake" ]; then
+	    echo "*** ERROR: qmake not found in $qmake (for Qt dir $qtdir)"
+	    exit 1
+	fi
+	qmake_arch=$(lipo -archs "$qtdir/bin/qmake")
+	if [ t"$qmake_arch" != t"$arch" ]; then
+	    echo "*** ERROR: wrong arch $qmake_arch for qmake $qmake (expected $arch)"
+	    exit 1
+	fi
+    done
+    echo -n "[Yn] ? "
+    read yn
+    case "$yn" in "") ;; [Yy]) ;; *) exit 3;; esac
+    echo "Proceeding"
+
+    ./repoint install
+
+    for arch in $archs; do
+
+	case "$arch" in
+	    x86_64) qtdir="$qtdir_x86_64";;
+	    arm64) qtdir="$qtdir_arm64";;
+	esac
+
+	rm -rf build-$arch
+	PATH="$qtdir/bin:$PATH" arch -$arch meson build-$arch --cross-file=deploy/cross/macos-$arch.txt --buildtype release -Db_lto=true
+	ninja -C build-$arch
+
+    done
+    
+    app="Sonic Visualiser"
+    volume="$app"-"$version"
+    dmg="$volume".dmg
+
+    rm -rf "$app.app"
+    rm -rf "$volume"
+    rm -f "$dmg"
+
+    deploy/macos/deploy-and-package.sh build-x86_64 build-arm64
+
+    mv "$dmg" packages/
+
+else
+
+    echo -n "Proceed to rebuild and package version $version [Yn] ? "
+    read yn
+    case "$yn" in "") ;; [Yy]) ;; *) exit 3;; esac
+    echo "Proceeding"
+
+    current=$(git rev-parse --short HEAD)
+
+    ./deploy/linux/build-and-test-appimage.sh
+
+    squashedversion=$(echo "$version" | sed 's/_-//g')
+
+    mv deploy/linux/docker/output/SonicVisualiser-"$current"-x86_64.AppImage \
+	packages/SonicVisualiser-"$squashedversion"-x86_64.AppImage
+	echo "Generate appImage done!"
+
+    ./deploy/linux/build-and-test-deb.sh
+    echo "Generate deb..."
+
+    mv deploy/linux/docker/output/sonic-visualiser_"$version"_amd64.deb \
+	packages/
+fi
+
+echo "Done"
+

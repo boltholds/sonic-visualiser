@@ -70,9 +70,9 @@ RUN ( echo '[ui]' ; echo 'ssh = ssh -i /root/.ssh/id_rsa_build' ) > .hgrc
 # clone is not cached from a different revision
 RUN echo Cloning revision [[REVISION]]
 
-RUN git clone https://github.com/sonic-visualiser/sonic-visualiser
+RUN git clone https://github.com/boltholds/sonic-visualiser
 WORKDIR sonic-visualiser
-RUN git checkout [[REVISION]]
+#RUN git checkout [[REVISION]]
 
 ENV QTDIR /opt/qt515
 ENV PATH /opt/qt515/bin:$PATH
