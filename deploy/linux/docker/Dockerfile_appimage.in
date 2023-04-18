@@ -23,7 +23,6 @@ RUN apt-get update && \
     libxml2-utils \
     libgl1-mesa-dev \
     raptor2-utils \
-    librubberband-dev \
     git \
     mercurial \
     curl wget unzip \
@@ -60,6 +59,12 @@ RUN wget https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-li
 RUN unzip ninja-linux.zip
 RUN ln -s $(pwd)/ninja /usr/bin/ninja
 
+RUN wget https://breakfastquay.com/files/releases/rubberband-3.1.1.tar.bz2
+RUN tar xvjf rubberband-3.1.1.tar.bz2
+WORKDIR rubberband-3.1.1
+RUN meson build -Ddefault_library=static && ninja -C build && ninja -C build install
+WORKDIR /root
+
 COPY id_rsa_build .ssh/id_rsa_build
 COPY known_hosts .ssh/known_hosts
 RUN chmod 600 .ssh/id_rsa_build .ssh/known_hosts
@@ -70,9 +75,9 @@ RUN ( echo '[ui]' ; echo 'ssh = ssh -i /root/.ssh/id_rsa_build' ) > .hgrc
 # clone is not cached from a different revision
 RUN echo Cloning revision [[REVISION]]
 
-RUN git clone https://github.com/boltholds/sonic-visualiser
+RUN git clone https://github.com/sonic-visualiser/sonic-visualiser
 WORKDIR sonic-visualiser
-#RUN git checkout [[REVISION]]
+RUN git checkout [[REVISION]]
 
 ENV QTDIR /opt/qt515
 ENV PATH /opt/qt515/bin:$PATH

@@ -4,19 +4,19 @@
       "pin": "7df85ecf98d9477c1ac5a36f51807062e00d8695"
     },
     "svcore": {
-      "pin": "1e947ce293dab5462812ce557c21d9f70b79f7a1"
+      "pin": "17e7e82561703bd103412a6fff7853ae76767e96"
     },
     "svgui": {
-      "pin": "9402dbd96d775fcc2ec5441b96157061579629a1"
+      "pin": "84d3249f6cce94c077b4f0efb711ec9b764134c7"
     },
     "svapp": {
-      "pin": "ecb09eb29997c109754b5f3f23307ad45ddc700f"
+      "pin": "0cbf649f12b2e2634ae0635fb37e97f38e9bf8b4"
     },
     "checker": {
       "pin": "ed75cff475c72381aedad936c72b93b4f38157d3"
     },
     "sv-dependency-builds": {
-      "pin": "62cccfd92193f3b9d20999fc8845a5c8acca8ed0"
+      "pin": "1ade9aa2e954271585c13b133a0de0ac3316af9d"
     },
     "icons/scalable": {
       "pin": "7b947da27cfa0b7f6a777684db38480eab695aae"
@@ -31,10 +31,10 @@
       "pin": "6e94b6858cb6"
     },
     "bqvec": {
-      "pin": "eb5c0e8e5b6f"
+      "pin": "97eea3bdd5d2"
     },
     "bqfft": {
-      "pin": "3560080ff66c"
+      "pin": "d41a117b8cbe"
     },
     "bqresample": {
       "pin": "1645e7be5e9f"
@@ -43,7 +43,7 @@
       "pin": "837b107363df"
     },
     "bqaudiostream": {
-      "pin": "fae51b1b633d"
+      "pin": "d8890ffd7b27"
     },
     "bqthingfactory": {
       "pin": "2e4bd170f57f"

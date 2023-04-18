@@ -45,6 +45,7 @@ bqaudiostream
 bqthingfactory
 build/
 sv-dependency-builds
+icons/scalable
 vamp-plugin-load-checker
 piper-vamp-simple-server
 piper-convert
