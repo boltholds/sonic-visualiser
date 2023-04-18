@@ -32,6 +32,8 @@
 #include <QSpinBox>
 #include <QListWidget>
 #include <QSettings>
+//font
+#include <QRegExpValidator>
 
 #include <set>
 
@@ -594,6 +596,21 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     m_tabOrdering[PluginTab] = m_tabs->count();
     m_tabs->addTab(m_pluginPathConfigurator, tr("&Plugins"));
     
+    //MPD tab
+    
+    frame = new QFrame;
+    subgrid = new QGridLayout;
+    frame->setLayout(subgrid);
+    row = 0;
+    
+    
+    
+    
+    
+    
+    m_tabOrdering[AnalysisTab] = m_tabs->count();
+    m_tabs->addTab(frame, tr("&MPD"));
+    
     // General tab
 
     frame = new QFrame;
@@ -625,6 +642,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     
     m_tabOrdering[GeneralTab] = m_tabs->count();
     m_tabs->addTab(frame, tr("&Other"));
+    
 
     QDialogButtonBox *bb = new QDialogButtonBox(Qt::Horizontal);
     grid->addWidget(bb, 1, 0);
