@@ -77,6 +77,17 @@
     <file>icons/scalable/sv-splash@2x.png</file>
     <file>icons/scalable/sv-splash-dark.svg</file>
 
+
+<!-- fontangrad -->
+	<file>icons/removesh.png</file>
+	<file>icons/magic.png</file>
+	<file>icons/rendersh.png</file>
+	<file>icons/exporttxt.png</file>
+
+
+<!-- fontangrad end-->
+
+
     <file>icons/image.png</file>
     <file>icons/draw-curve.png</file>
     <file>icons/measure.png</file>

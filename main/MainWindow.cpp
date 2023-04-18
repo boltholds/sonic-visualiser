@@ -17,7 +17,7 @@
 
 #include "MainWindow.h"
 #include "PreferencesDialog.h"
-
+#include "view/View.h" //fontangrad
 #include "view/Pane.h"
 #include "view/PaneStack.h"
 #include "data/model/WaveFileModel.h"
@@ -137,6 +137,8 @@ using std::vector;
 using std::map;
 using std::set;
 
+QString OpenedSVfilePath; //fontangrad
+
 
 MainWindow::MainWindow(AudioMode audioMode, MIDIMode midiMode, bool withOSCSupport) :
     MainWindowBase(audioMode, midiMode, int(PaneStack::Option::Default)),
@@ -178,6 +180,12 @@ MainWindow::MainWindow(AudioMode audioMode, MIDIMode midiMode, bool withOSCSuppo
     m_keyReference(new KeyReference()),
     m_templateWatcher(nullptr),
     m_shouldStartOSCQueue(false)
+        //fontangrad
+    m_ExportTxtAction(nullptr),
+    m_RenderShAction(nullptr),
+    m_MagicAction(nullptr),
+    m_RemoveShAction(nullptr)
+    //
 {
     Profiler profiler("MainWindow::MainWindow");
 
@@ -589,6 +597,7 @@ MainWindow::setupFileMenu()
     connect(this, SIGNAL(canImportLayer(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
+    
 
     action = new QAction(tr("Export Annotation La&yer..."), this);
     action->setShortcut(tr("Ctrl+Y"));
@@ -597,6 +606,8 @@ MainWindow::setupFileMenu()
     connect(this, SIGNAL(canExportLayer(bool)), action, SLOT(setEnabled(bool)));
     m_keyReference->registerShortcut(action);
     menu->addAction(action);
+    
+    QString OpenedSVfilePath; //fontangrad
 
     menu->addSeparator();
     
@@ -2319,6 +2330,62 @@ MainWindow::setupToolbars()
             m_recordAction, SLOT(setChecked(bool)));
     connect(this, SIGNAL(canRecord(bool)),
             m_recordAction, SLOT(setEnabled(bool)));
+            
+            
+            
+    //fontangrad
+
+    toolbar = addToolBar(tr("Fontangrad Toolbar"));
+    /* const  QIcon exporttxtIcon =  QIcon :: fromTheme ( "exporttxt" ,  QIcon ( ":/icons/exporttxt.png" )); 
+    const  QIcon rendershIcon =  QIcon :: fromTheme ( "rendersh" ,  QIcon ( ":/icons/rendersh.png" )); 
+    const  QIcon magicIcon =  QIcon :: fromTheme ( "magic" ,  QIcon ( ":/icons/magic.png" ));   */
+    /*Export.TXT Button tools*/ 
+    m_ExportTxtAction = toolbar->addAction(il.load("exporttxt"),
+                                            //exporttxtIcon,
+                                          tr("Export Anotate to txt file"));
+    m_ExportTxtAction->setCheckable(false);
+    //m_ExportTxtAction->setChecked(m_viewManager->getExportTxtMode());
+    m_ExportTxtAction->setShortcut(tr("Ctrl+K"));
+    m_ExportTxtAction->setStatusTip(tr("Export .txt to .sv folder"));
+    connect(m_ExportTxtAction, SIGNAL(triggered()), this, SLOT(exportTxtLayer()));
+    connect(this, SIGNAL(canExportLayer(bool)), m_ExportTxtAction, SLOT(setEnabled(bool)));
+
+    /*Render Button tools*/
+    m_RenderShAction = toolbar->addAction(il.load("rendersh"),
+                                        //rendershIcon,
+                                          tr("Run render.sh"));
+    m_RenderShAction->setCheckable(false);
+    //m_RenderShAction->setChecked(m_viewManager->getRenderShMode());
+    m_RenderShAction->setShortcut(tr("Ctrl+["));
+    m_RenderShAction->setStatusTip(tr("Run render.sh on bash"));                                   
+    connect(m_RenderShAction, SIGNAL(triggered()), this, SLOT(RunRenderSH()));
+    connect(this, SIGNAL(canExportLayer(bool)), m_RenderShAction, SLOT(setEnabled(bool)));
+    
+    /*Magic Button tools*/
+    
+    m_MagicAction = toolbar->addAction(il.load("magic"),
+                                        //magicIcon,
+                                          tr("It's Magic! You know!"));
+    m_MagicAction->setCheckable(false);
+    //m_MagicAction->setChecked(m_viewManager->getMagicMode());
+    m_MagicAction->setShortcut(tr("Ctrl+Shift+R"));
+    m_MagicAction->setStatusTip(tr("Export txt & run render.sh"));
+    connect(m_MagicAction, SIGNAL(triggered()), this, SLOT(RunMagic()));
+    connect(this, SIGNAL(canExportLayer(bool)),m_MagicAction, SLOT(setEnabled(bool)));                                  
+     
+     /*Remove render file*/
+    m_RemoveShAction  = toolbar->addAction(il.load("removesh"),
+                                        //magicIcon,
+                                          tr("Remove render's file"));
+    m_RemoveShAction->setCheckable(false);
+    m_RemoveShAction->setShortcut(tr("Ctrl+Shift+]"));
+    m_RemoveShAction->setStatusTip(tr("Export txt & run render.sh"));
+    connect(m_RemoveShAction, SIGNAL(triggered()), this, SLOT(RunRemoveSH()));
+    connect(this, SIGNAL(canExportLayer(bool)),m_RemoveShAction, SLOT(setEnabled(bool)));
+    
+    
+    
+    
 
     toolbar = addToolBar(tr("Play Mode Toolbar"));
 
@@ -2379,6 +2446,12 @@ MainWindow::setupToolbars()
     m_keyReference->registerShortcut(m_ffwdSimilarAction);
     m_keyReference->registerShortcut(m_rwdStartAction);
     m_keyReference->registerShortcut(m_ffwdEndAction);
+        //fontangrad
+     m_keyReference->registerShortcut(m_ExportTxtAction);
+     m_keyReference->registerShortcut(m_RenderShAction);
+     m_keyReference->registerShortcut(m_MagicAction);
+     m_keyReference->registerShortcut(m_RemoveShAction);
+    //
 
     menu->addAction(m_playAction);
     menu->addAction(m_recordAction);
@@ -2387,6 +2460,13 @@ MainWindow::setupToolbars()
     menu->addAction(m_soloAction);
     menu->addAction(alAction);
     menu->addSeparator();
+        //fontangrad ->
+    menu->addAction(m_ExportTxtAction);
+    menu->addAction(m_RenderShAction);
+    menu->addAction(m_MagicAction);
+    m_keyReference->registerShortcut(m_RemoveShAction);
+    menu->addSeparator();
+    //<-
     menu->addAction(m_rwdAction);
     menu->addAction(m_ffwdAction);
     menu->addSeparator();
@@ -2405,6 +2485,13 @@ MainWindow::setupToolbars()
     m_rightButtonPlaybackMenu->addAction(m_soloAction);
     if (alAction) m_rightButtonPlaybackMenu->addAction(alAction);
     m_rightButtonPlaybackMenu->addSeparator();
+         //fontangrad ->
+    m_rightButtonPlaybackMenu->addAction(m_ExportTxtAction);
+    m_rightButtonPlaybackMenu->addAction(m_RenderShAction);
+    m_rightButtonPlaybackMenu->addAction(m_MagicAction);
+     m_rightButtonPlaybackMenu->addAction(m_RemoveShAction);
+    m_rightButtonPlaybackMenu->addSeparator();
+    //<-
     m_rightButtonPlaybackMenu->addAction(m_rwdAction);
     m_rightButtonPlaybackMenu->addAction(m_ffwdAction);
     m_rightButtonPlaybackMenu->addSeparator();
@@ -3259,6 +3346,111 @@ MainWindow::exportLayer()
     }
 }
 
+	
+	
+// fontangrad
+void
+MainWindow::exportTxtLayer()
+{
+	Pane *pane = m_paneStack->getCurrentPane();
+	if (!pane) return;
+
+	Layer *layer = pane->getSelectedLayer();
+	if (!layer) return;
+
+	auto model = ModelById::get(layer->getModel());
+	if (!model) return; 
+
+
+	QString TxtLayerPath;
+	//TxtLayerPath = OpenedSVfilePath;
+		QMessageBox::critical(this, tr("Failed to write file"), error);
+	}
+	else {
+		m_recentFiles.addFile(TxtLayerPath);
+		emit activity(tr("Export layer to \"%1\"").arg(TxtLayerPath));
+	}
+}
+
+void
+MainWindow::RunRenderSH()
+{
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+    cerr << "pkill render..." << endl;
+    //int error = system("pkill render");
+     int error = system("pkill render");
+     error = system("alias python='/bin/python3'");
+    //cerr << "sudo ps aux | grep " <<endl;
+    QString RenderRunComand;
+    QString tmpstr1 = m_sessionFile;
+    //QString tmpstr1 = OpenedSVfilePath;
+    QString tmpstr2;
+
+    tmpstr2 = tmpstr1.left(tmpstr1.lastIndexOf("/"));
+    RenderRunComand = tmpstr2.left(tmpstr2.lastIndexOf("/"));
+    RenderRunComand.append("/render.sh ");
+
+    tmpstr1 = m_sessionFile;
+    tmpstr2 = tmpstr1.right(tmpstr1.length()-tmpstr1.lastIndexOf("/")-1);
+    RenderRunComand.append(tmpstr2);
+    RenderRunComand.chop(3);
+    RenderRunComand.insert(0, QString("gnome-terminal --tab --maximize -e '"));
+    //RenderRunComand.insert(0, QString("gnome-terminal --tab --maximize -- sh -c '"));
+    RenderRunComand.append(QString("'"));
+
+    cerr << "RenderRunComand = " << (RenderRunComand) << endl;
+    error = system(RenderRunComand.toStdString().c_str());
+
+    QApplication::restoreOverrideCursor();
+}
+
+void
+MainWindow::RunMagic()
+{
+        saveSession();
+	exportTxtLayer();
+	RunRenderSH();
+}
+//
+//void
+//MainWindow::SetPointerFromMPD()
+//{
+//	Pane *currentPane = m_paneStack->getCurrentPane();
+//	currentPane->setCentreFrame(10000);
+//}
+void
+MainWindow::RunRemoveSH()
+{
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+    cerr << "pkill remove..." << endl;
+    int error = system("pkill remove");
+
+    QString RenderRunComand;
+    QString tmpstr1 = m_sessionFile;
+    QString tmpstr2;
+
+    tmpstr2 = tmpstr1.left(tmpstr1.lastIndexOf("/"));
+    RenderRunComand = tmpstr2.left(tmpstr2.lastIndexOf("/"));
+    RenderRunComand.append("/remove.sh ");
+
+    tmpstr1 = m_sessionFile;
+    tmpstr2 = tmpstr1.right(tmpstr1.length()-tmpstr1.lastIndexOf("/")-1);
+    RenderRunComand.append(tmpstr2);
+    RenderRunComand.chop(3);
+    RenderRunComand.insert(0, QString("gnome-terminal --tab --maximize -e '"));
+    RenderRunComand.append(QString("'"));
+
+    cerr << "RenderRunComand = " << (RenderRunComand) << endl;
+    error = system(RenderRunComand.toStdString().c_str());
+
+    QApplication::restoreOverrideCursor();
+}
+
+
+// fontangrad
+
 void
 MainWindow::exportImage()
 {
@@ -3526,7 +3718,7 @@ MainWindow::openSomething()
     else orig = QFileInfo(orig).absoluteDir().canonicalPath();
 
     QString path = getOpenFileName(FileFinder::AnyFile);
-
+    OpenedSVfilePath = path; //fontangrad
     if (path.isEmpty()) return;
 
     FileOpenStatus status = openPath(path, ReplaceSession);
@@ -3989,6 +4181,7 @@ MainWindow::saveSession()
     }
 }
 
+
 void
 MainWindow::saveSessionAs()
 {
@@ -3997,7 +4190,7 @@ MainWindow::saveSessionAs()
     else orig = QFileInfo(orig).absoluteDir().canonicalPath();
 
     QString path = getSaveFileName(FileFinder::SessionFile);
-
+    OpenedSVfilePath = path; //fontangrad
     if (path == "") return;
 
     if (!saveSessionFile(path)) {
