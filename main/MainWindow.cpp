@@ -179,7 +179,7 @@ MainWindow::MainWindow(AudioMode audioMode, MIDIMode midiMode, bool withOSCSuppo
     m_unitConverter(new UnitConverter()),
     m_keyReference(new KeyReference()),
     m_templateWatcher(nullptr),
-    m_shouldStartOSCQueue(false)
+    m_shouldStartOSCQueue(false),
         //fontangrad
     m_ExportTxtAction(nullptr),
     m_RenderShAction(nullptr),
@@ -3363,7 +3363,24 @@ MainWindow::exportTxtLayer()
 
 
 	QString TxtLayerPath;
-	//TxtLayerPath = OpenedSVfilePath;
+    
+	TxtLayerPath = OpenedSVfilePath;
+    TxtLayerPath.chop(2);
+    TxtLayerPath.append("txt");
+    cerr << "TxtLayerPath =" << (TxtLayerPath) << endl;
+
+    QString suffix = "txt";
+    QString error;
+
+    CSVFileWriter writer(TxtLayerPath, model.get(),
+        ((suffix == "csv") ? "," : "\t"));
+    writer.write();
+
+    if (!writer.isOK()) {
+        error = writer.getError();
+    }
+
+    if (error != "") {
 		QMessageBox::critical(this, tr("Failed to write file"), error);
 	}
 	else {
@@ -3389,7 +3406,7 @@ MainWindow::RunRenderSH()
 
     tmpstr2 = tmpstr1.left(tmpstr1.lastIndexOf("/"));
     RenderRunComand = tmpstr2.left(tmpstr2.lastIndexOf("/"));
-    RenderRunComand.append("/render.sh ");
+    RenderRunComand.append("/scripts/render.sh ");
 
     tmpstr1 = m_sessionFile;
     tmpstr2 = tmpstr1.right(tmpstr1.length()-tmpstr1.lastIndexOf("/")-1);
@@ -3433,7 +3450,7 @@ MainWindow::RunRemoveSH()
 
     tmpstr2 = tmpstr1.left(tmpstr1.lastIndexOf("/"));
     RenderRunComand = tmpstr2.left(tmpstr2.lastIndexOf("/"));
-    RenderRunComand.append("/remove.sh ");
+    RenderRunComand.append("/scripts/remove.sh ");
 
     tmpstr1 = m_sessionFile;
     tmpstr2 = tmpstr1.right(tmpstr1.length()-tmpstr1.lastIndexOf("/")-1);
