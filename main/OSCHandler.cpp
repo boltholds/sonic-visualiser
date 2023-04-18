@@ -408,54 +408,6 @@ MainWindow::handleOSCMessage(const OSCMessage &message)
             }
         }
 
-    //fontangrad
-    /*This func activate ico*/
-    /*
-    } else if (message.getMethod() == "exptxt") {
-
-        if (message.getArgCount() == 1 &&
-            message.getArg(0).canConvert(QVariant::String)) {
-
-            QString str = message.getArg(0).toString();
-            if (str == "on") {
-                SVDEBUG << "OSCHandler: Enabling Export TXT mode" << endl;
-                m_viewManager->getExportTxtMode(true);
-            } else if (str == "off") {
-                SVDEBUG << "OSCHandler: Disabling Export TXT mode" << endl;
-                m_viewManager->getExportTxtMode(false);
-            }
-        }
-    } else if (message.getMethod() == "render") {
-
-        if (message.getArgCount() == 1 &&
-            message.getArg(0).canConvert(QVariant::String)) {
-
-            QString str = message.getArg(0).toString();
-            if (str == "on") {
-                SVDEBUG << "OSCHandler: Enabling Render.sh mode" << endl;
-                m_viewManager->getRenderShMode(true);
-            } else if (str == "off") {
-                SVDEBUG << "OSCHandler: Disabling Render.sh mode" << endl;
-                m_viewManager->getRenderShMode(false);
-            }
-        }
-        
-    } else if (message.getMethod() == "magic") {
-
-        if (message.getArgCount() == 1 &&
-            message.getArg(0).canConvert(QVariant::String)) {
-
-            QString str = message.getArg(0).toString();
-            if (str == "on") {
-                SVDEBUG << "OSCHandler: Enabling Render.sh mode" << endl;
-                m_viewManager->getMagicMode(true);
-            } else if (str == "off") {
-                SVDEBUG << "OSCHandler: Disabling Render.sh mode" << endl;
-                m_viewManager->getMagicMode(false);
-            }
-        }
-    //fontangrad
-    */
     } else if (message.getMethod() == "select" ||
                message.getMethod() == "addselect") {
 

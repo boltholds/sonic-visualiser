@@ -32,8 +32,6 @@
 #include <QSpinBox>
 #include <QListWidget>
 #include <QSettings>
-//font
-#include <QRegExpValidator>
 
 #include <set>
 
@@ -268,6 +266,13 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
                                   Qt::Unchecked);
     connect(resampleOnLoad, SIGNAL(stateChanged(int)),
             this, SLOT(resampleOnLoadChanged(int)));
+
+    QCheckBox *finerTimeStretch = new QCheckBox;
+    m_finerTimeStretch = prefs->getFinerTimeStretch();
+    finerTimeStretch->setCheckState(m_finerTimeStretch ? Qt::Checked :
+                                    Qt::Unchecked);
+    connect(finerTimeStretch, SIGNAL(stateChanged(int)),
+            this, SLOT(finerTimeStretchChanged(int)));
 
     QCheckBox *gaplessMode = new QCheckBox;
     m_gapless = prefs->getUseGaplessMode();
@@ -581,6 +586,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
                        row, 0);
     subgrid->addWidget(resampleOnLoad, row++, 1, 1, 1);
 
+    subgrid->addWidget(new QLabel(tr("%1:").arg(prefs->getPropertyLabel
+                                                ("Use Finer Time Stretch"))),
+                       row, 0);
+    subgrid->addWidget(finerTimeStretch, row++, 1, 1, 1);
+
     subgrid->setRowStretch(row, 10);
     
     m_tabOrdering[AudioIOTab] = m_tabs->count();
@@ -595,21 +605,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     
     m_tabOrdering[PluginTab] = m_tabs->count();
     m_tabs->addTab(m_pluginPathConfigurator, tr("&Plugins"));
-    
-    //MPD tab
-    
-    frame = new QFrame;
-    subgrid = new QGridLayout;
-    frame->setLayout(subgrid);
-    row = 0;
-    
-    
-    
-    
-    
-    
-    m_tabOrdering[AnalysisTab] = m_tabs->count();
-    m_tabs->addTab(frame, tr("&MPD"));
     
     // General tab
 
@@ -642,7 +637,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     
     m_tabOrdering[GeneralTab] = m_tabs->count();
     m_tabs->addTab(frame, tr("&Other"));
-    
 
     QDialogButtonBox *bb = new QDialogButtonBox(Qt::Horizontal);
     grid->addWidget(bb, 1, 0);
@@ -833,6 +827,13 @@ PreferencesDialog::resampleOnLoadChanged(int state)
 }
 
 void
+PreferencesDialog::finerTimeStretchChanged(int state)
+{
+    m_finerTimeStretch = (state == Qt::Checked);
+    m_applyButton->setEnabled(true);
+}
+
+void
 PreferencesDialog::gaplessModeChanged(int state)
 {
     m_gapless = (state == Qt::Checked);
@@ -990,6 +991,7 @@ PreferencesDialog::applyClicked()
                                 (m_propertyLayout));
     prefs->setTuningFrequency(m_tuningFrequency);
     prefs->setResampleOnLoad(m_resampleOnLoad);
+    prefs->setFinerTimeStretch(m_finerTimeStretch);
     prefs->setUseGaplessMode(m_gapless);
     prefs->setRunPluginsInProcess(m_runPluginsInProcess);
     prefs->setShowSplash(m_showSplash);
